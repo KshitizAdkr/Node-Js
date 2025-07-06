@@ -1,7 +1,18 @@
 class authController {
   register = (req, res, next) => {
+
+    const data = req.body;
+    //manually
+    if(!data.name){
+      next({
+        details: {name: "Name is required"}
+        
+
+      })
+    }
+
     res.json({
-      data: { _id: 123, name: "Kaii" },
+      data: data,
       message: "Your account has been registered successfully",
       status: "SUCCESS",
     });
