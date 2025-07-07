@@ -173,3 +173,9 @@ open/close
 
 app.use: universal method i.e. accepts all get,push,.....,etc.
 Middleware can manipulate the incoming request.
+
+Custom middlware, routing level middleware,error handling error
+
+
+joi,yup,xod,clas validator
+server configuration related mistake: 500 error

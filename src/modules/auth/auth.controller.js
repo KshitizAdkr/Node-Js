@@ -1,15 +1,9 @@
 class authController {
   register = (req, res, next) => {
 
-    const data = req.body;
-    //manually
-    if(!data.name){
-      next({
-        details: {name: "Name is required"}
-        
+    let data = req.body;
+    data.image = req.file
 
-      })
-    }
 
     res.json({
       data: data,

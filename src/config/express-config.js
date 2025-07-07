@@ -37,7 +37,7 @@ app.use((error, req, res, next) => {
   let status = error.status || "ERR_SERVER_ERROR"
 
   // TODO: 
-
+  console.log(error)
   res.status(code).json({
     error: detail,
     message: message,
