@@ -208,3 +208,40 @@ User(password authentication for database):
     3eTr8XVrDjxrLQsn
 
  Public Domain: 0.0.0.0/0 or 8.8.8.8/8
+
+
+ ## Crud operation
+ -Create
+  - `db.<collection>.insertOne(jsonObj)`
+  - `db.<collection>.insertMany([jsonObjs])`
+  
+  -Update
+    - `db.<collection>.updateOne(filter, {set: {data}}, {upsert: true/1})`    //first priority update ,second priority insert
+    - `db.<collection>.updateMany(filter, {set: {data}}, {upsert: true/1})`
+    - `db.<collection>.findOneAndUpdate(filter, {set: {data}}, {upsert: true/1})`
+    - `db.<collection>.findByAndUpdate(filter, {set: {data}}, {upsert: true/1})`
+  
+  -Read
+    - `db.<collection>.find(filter, projection, options)`
+    - `db.<collection>.findOne(filter, projection, options)`
+    - `db.<collection>.findById(id)`
+
+  -Delete
+    -db.<collection>.deleteOne<filter>
+    -db.<collection>.deleteMany<filter>
+    -db.<collection>.findOneAndRemove<filter>
+    -db.<collection>.findOneAndDelete<filter>
+
+
+   ##filter
+   ```json
+   {
+    "key": "value",
+    "key1": "value",
+   } 
+
+   {}
+   // $gt,$gte, $ite, 
+
+//orm and odm
+   HW: Data requireed for eccomerce project.

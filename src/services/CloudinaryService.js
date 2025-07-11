@@ -1,10 +1,12 @@
 const cloudinary = require("cloudinary").v2
+const { error } = require("console")
 const { CloudinaryConfig } = require("../config/config")
 const fs = require("fs") 
 
 
 class CloudinaryService{
     constructor() {
+        // console.log(CloudinaryConfig)
         cloudinary.config({
             cloud_name: CloudinaryConfig.cloudName,
             api_key: CloudinaryConfig.apiKey,
@@ -29,7 +31,7 @@ class CloudinaryService{
                 folder: '/api-49'+dir,
                 unique_filename: true
             })
-        if(fs.exitsSync(path)) {
+        if(fs.existsSync(path)) {
             fs.unlinkSync(path)
         }
 
@@ -39,14 +41,16 @@ class CloudinaryService{
         publicId: public_id,
         url: secure_url,
         thumb: url 
-      }
+      }   
         }
         catch(exception) {
+            console.log(exception);
             throw {
                 code: 422,
                 message: "File upload error on cloudinary",
                 status: "ERR_FILE_UPLOAD_ON_CLOUDINARY"
             }
+            
         }
     }
 }

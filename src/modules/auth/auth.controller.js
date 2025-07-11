@@ -1,5 +1,6 @@
 const cloudinarySvc = require("../../services/CloudinaryService");
 const { randomStringGenerator } = require("../../utilities/helpers");
+const bcrypt = require("bcryptjs");
 
 class authController {
   async register(req, res, next) {
