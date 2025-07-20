@@ -125,6 +125,7 @@ client side rendering
   - Update
   - Delete
 - User //Name,email,passwaord,phone no
+  ***Data: import from github *** 
   - Create
   - Read all
   - Single read
@@ -245,3 +246,4 @@ User(password authentication for database):
 
 //orm and odm
    HW: Data requireed for eccomerce project.
+
