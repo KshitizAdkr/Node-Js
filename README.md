@@ -124,38 +124,43 @@ client side rendering
   - Single read
   - Update
   - Delete
-- User //Name,email,passwaord,phone no
-  ***Data: import from github *** 
+- User 
+  ***Data: id(autofill), name, email(unique), password, role, status, activationToken, resetToken, expiryTime, dob, gender, image, address, createdAt,updatedat, createdby, updatedBy*** 
   - Create
   - Read all
   - Single read
   - Update
   - Delete
 - Product //Product name, description, overview ,price, image
+  ***Data: product_id(autofill), name, desciption, price, currency, QuanityInStock, ImageUrl, features, AverageRating, image,  createdBy, updatedBy, NumberOfReviews*** 
   - Create
   - Read all
   - Single read
   - Update
   - Delete
 - Order //User id,product id, Quanttity, Price
+  ***Data: order_id(autofill), UserID, OrderNumber, OrderDate, TotalAmount, Currency, Paymentstatus, PaymentMethod *** 
   - Create
   - Read all
   - Single read
   - Update
   - Delete
 - Order detail(cart) // No. of qunatity, total price , Product id
+  ***Data: order_id(autofill), UserID, OrderNumber, priceAtAddition, OrderDate, TotalAmount, Currency, addedAt, updateAt, createdAt, createdBy *** 
   - Create
   - Read all
   - Single read
   - Update
   - Delete
 - Payment/Transcations // Stripe/Khalti
+***Data: transaction_id(autofill), order_id(autofill), UserID, Amount, Currency, Type, Status, PaymentGateway, transactionDateOrderNumber, OrderDate, TotalAmount, Currency, Paymentstatus, PaymentMethod ,createdAt,updatedat, createdby, updatedBy, cardType***  
   - Create
   - Read all
   - Single read
   - Update
   - Delete
 - Chat // DialogueFlow , Automated message,
+  ***Data: id(autofill), sessionID, type, senderType, messageContent, timeStamp, channel, metaData *** 
   - Create
   - Read all
   - Single read
@@ -247,3 +252,4 @@ User(password authentication for database):
 //orm and odm
    HW: Data requireed for eccomerce project.
 
+SMTP

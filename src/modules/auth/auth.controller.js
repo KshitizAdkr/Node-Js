@@ -1,6 +1,7 @@
 const cloudinarySvc = require("../../services/CloudinaryService");
 const { randomStringGenerator } = require("../../utilities/helpers");
 const bcrypt = require("bcryptjs");
+const userModel = require("../user/user.model");
 
 class authController {
   async register(req, res, next) {
@@ -24,9 +25,15 @@ class authController {
       //activation process
       data.status = 'inactive'  //activated not
       data.activationToken = randomStringGenerator()  //random string
+      data.expiryTime = new Date(Date.now() + 8640000)
 
       // store data (database)
-      //email
+      let user = new userModel(data);
+      await user.save()
+
+
+      //notify
+
 
       res.json({
         data: data,
