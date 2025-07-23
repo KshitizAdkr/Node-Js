@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
        await mongoose.connect(MongodbConfig.url,{
         dbName: MongodbConfig.dbName,
         autoCreate: true,
-        autoIndex: true
+        autoIndex: true,
        }) 
        console.log("**** Mongodb Server Connected Succesully... ****")
     }

@@ -2,6 +2,7 @@ const cloudinarySvc = require("../../services/CloudinaryService");
 const { randomStringGenerator } = require("../../utilities/helpers");
 const bcrypt = require("bcryptjs");
 const userModel = require("../user/user.model");
+const authMailSvc = require("./auth.mail");
 
 class authController {
   async register(req, res, next) {
@@ -33,10 +34,17 @@ class authController {
 
 
       //notify
-
+      await authMailSvc.sendActivationEmail(user)
 
       res.json({
-        data: data,
+        data: {
+          _id: user._id,
+          name: user.name, 
+          email: user.email, 
+          role: user.role, 
+          status: user.status, 
+          image: user.image
+        },
         message: "Your account has been registered successfully",
         status: "SUCCESS",
       });

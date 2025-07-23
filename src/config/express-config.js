@@ -1,5 +1,6 @@
 const express = require("express")
 require("./mongodb.config");
+
 const router = require("./router.config")
 const path = require("path");
 
@@ -32,13 +33,24 @@ app.use((req, res, next) => {
 
 // error handling middleware
 app.use((error, req, res, next) => {
+  //console.log(error)
   let code = error.code || 500
   let detail = error.detail || "Internal App Error..."
   let message = error.message || "Internal server error..."
   let status = error.status || "ERR_SERVER_ERROR"
 
-  // TODO: 
-  console.log(error)
+  // TODO:
+  if (error.name === "MongoServerError") {
+    code= 400;
+    message= "Validation failed";
+    status = "VALIDATION_FAILED_ERR"
+    detail = {}
+
+    Object.keys(error.keyPattern).map((key) => {
+      detail = `${key} already exists`;
+    })
+  } 
+  // console.log(error)
   res.status(code).json({
     error: detail,
     message: message,
