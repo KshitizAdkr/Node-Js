@@ -254,3 +254,8 @@ User(password authentication for database):
 
 SMTP
 : 25,2525,587(google)
+
+//mongodb+srv://api-49:3eTr8XVrDjxrLQsn@api-49.5m2gr5b.mongodb.net/?retryWrites=true&w=majority&appName=api-49  //  
+
+
+// mongodb+srv://kshitizd97:3eTr8XVrDjxrLQsn@cluster0.pk3jv.mongodb.net/?appName=Cluster0

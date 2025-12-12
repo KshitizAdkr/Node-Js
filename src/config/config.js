@@ -21,6 +21,7 @@ const SmtpConfig ={
 
 const AppConfig = {
   frontendUrl: process.env.FRONTEND_URL,
+   jwtSecret: process.env.JWT_SECRET,
 };
 
 module.exports = {

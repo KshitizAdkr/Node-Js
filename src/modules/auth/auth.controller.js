@@ -1,95 +1,205 @@
-const cloudinarySvc = require("../../services/CloudinaryService");
-const { randomStringGenerator } = require("../../utilities/helpers");
-const bcrypt = require("bcryptjs");
-const userModel = require("../user/user.model");
+const { GlobalStatus } = require("../../config/constants");
+const userSvc = require("../user/user.service");
 const authMailSvc = require("./auth.mail");
+const authSvc = require("./auth.service");
+const bcrypt = require('bcryptjs')
 
-class authController {
+
+class AuthController {
   async register(req, res, next) {
     try {
-
-      let data = req.body;
-
-      if (!req.file) {
-        next({
-          code: 400,
-          detail: { image: "Image is required" },
-          message: "Image not provided",
-          status: "ERR_VALIDATION_FAILED",
-        });
-      }
-
-      data.image = await cloudinarySvc.fileUpload(req.file.path, '/users')
-         //const salt = bcrypt.genSaltSync(12), instead,use the down one;
-      data.password = bcrypt.hashSync(data.password, 12)
-
-      //activation process
-      data.status = 'inactive'  //activated not
-      data.activationToken = randomStringGenerator()  //random string
-      data.expiryTime = new Date(Date.now() + 8640000)
-
+      // user raw data =====> DB user model mapping
+      const data = await authSvc.transformForRegistration(req);
       // store data (database)
-      let user = new userModel(data);
-      await user.save()
-
-
-      //notify
-      await authMailSvc.sendActivationEmail(user)
-
+      let user = await userSvc.storeUser(data);
+      // notify
+      await authMailSvc.sendActivationEmail(user);
       res.json({
         data: {
           _id: user._id,
-          name: user.name, 
-          email: user.email, 
-          role: user.role, 
-          status: user.status, 
-          image: user.image
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+          image: user.image,
         },
         message: "Your account has been registered successfully",
         status: "SUCCESS",
       });
+    } catch (exception) {
+      next(exception);
+    }
+  }
+
+  async activateRegisteredUser(req, res, next) {
+    try {
+      const token = req.params.token;
+      // token verify
+      let userDetail = await userSvc.getSingleUserByFilter({
+        activationToken: token,
+      });
+      if (!userDetail) {
+        throw {
+          code: 422,
+          message: "Token not found or associated user not found...",
+          status: "TOKEN_NOT_FOUND_ERR",
+        };
+      }
+
+      // user
+      const currentTime = Date.now();
+      const expiryTime = userDetail.expiryTime.getTime();
+      if (expiryTime < currentTime) {
+        throw {
+          code: 422,
+          message: "TOken expired",
+          status: "TOKEN_EXPIRED_ERR",
+        };
+      }
+
+      const activateData = {
+        status: GlobalStatus.ACTIVE,
+        activationToken: null,
+        expiryTime: null,
+      };
+
+      userDetail = await userSvc.updateSingleUserByFilter({ _id: userDetail._id },activateData);
+
+      // notify
+      await authMailSvc.sendWelcomeEmailToUser(userDetail);
+
+      // TODO: auto Login
+      const session = await authSvc.storeSession(userDetail);
+      res.json({
+        data: {
+          _id: session._id,
+          tokens: session.tokens,
+        },
+        message: "Your account has been activated successfully",
+        status: "SUCCESS",
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  }
+
+  async resendActivationEmail(req, res, next) {
+    try {
+      const token = req.params.token;
+      // token verify
+      const userDetail = await userSvc.getSingleUserByFilter({
+        activationToken: token,
+      });
+      if (!userDetail) {
+        throw {
+          code: 422,
+          message: "Token not found or associated user not found...",
+          status: "TOKEN_NOT_FOUND_ERR",
+        };
+      }
+
+      const currentTime = Date.now();
+      const expiryTime = userDetail.expiryTime.getTime();
+
+      //
+      if (expiryTime >= currentTime) {
+        throw {
+          code: 422,
+          message: "Your token is not expired...",
+          status: "TOKEN_NOT_EXPIRED_ERR",
+        };
+      }
+
+      const updateToken = {
+        ...authSvc.generateActivationToken(),
+      };
+
+      const user = await userSvc.updateSingleUserByFilter(
+        { _id: userDetail._id },
+        updateToken
+      );
+      await authMailSvc.reSendActivationEmail(user);
+
+      res.json({
+        data: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+          image: user.image,
+        },
+        message: "A new activation link has been sent to your email",
+        status: "SUCCESS",
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  }
+
+  async login(req, res, next) {
+    try {
+      const {email, password, loginType} = req.body;
+      const userDetail = await userSvc.getSingleUserByFilter({
+        email: email
+      })
+      if(!userDetail) {
+        throw {code: 422, message: "User not found/registered", status: "USER_NOT_FOUND"}
+      }
+
+      // 
+      console.log(userDetail)
+      if(userDetail.status !== GlobalStatus.ACTIVE || userDetail.activationToken !== null) {
+        throw {code: 422, message: "Your account has not been activated or is suspended", status: "ACCOUNT_NOT_ACTIVATED"}
+      }
+
+      // password verify
+      if(!bcrypt.compareSync(password, userDetail.password)) {
+        throw {code: 422, message: "Credentials does not match", status: "CREDENTIALS_DOES_NOT_MATCH"}
+      }
+
+      // TODO: Generate OTP -> db update with user -> email user -> respond to user.
+      const session = await authSvc.storeSession(userDetail, loginType)
+      res.json({
+        data: {
+          _id: session._id, 
+          tokens: session.tokens
+        }, 
+        message: "Login Successful",
+        status: "LOGIN_SUCCESS"
+      })
+
     } catch(exception) {
       next(exception)
     }
   }
 
-
-  login = (req, res, next) => {
+  async getLoggedInUserProfile(req, res, next) {
     res.json({
-      data: "Login Request",
-      message: "Log-In successful",
-      status: "SUCCESS",
+      data: req.loggedInUser,
+      message: "Your profile",
+      status: "ME",
     });
-  };
+  }
 
-  activate = (req, res, next) => {
-    res.json({
-      data: {
-        params: req.params,
-      },
-      message: "User account has been activated successfully",
-      status: "OK",
-    });
-  };
-
-  update = (req, res, next) => {
+  updateUserById = (req, res, next) => {
     res.json({
       data: {
         params: req.params,
       },
       message: "Update User",
-      status: "SUCCESS",
+      status: "OK",
     });
   };
 
-  Logout = (req, res, next) => {
+  logout = (req, res, next) => {
     res.json({
       data: null,
-      message: "User has logged out successfully",
+      message: "Logout success",
       status: "OK",
     });
   };
 }
 
-const authCtrl = new authController();
+const authCtrl = new AuthController();
 module.exports = authCtrl;

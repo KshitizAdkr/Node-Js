@@ -15,8 +15,15 @@ const Gender = {
     OTHER: "other"
 }
 
+const DeviceTypes =  {
+  WEB: 'web',
+  MOBILE: 'mobile', 
+  OTHER: 'other'
+}
+
 module.exports = {
     UserRoles,
     GlobalStatus,
-    Gender
+    Gender,
+    DeviceTypes
 }

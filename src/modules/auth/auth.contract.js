@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { DeviceTypes } = require("../../config/constants");
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[\w_]).{8,25}$/;
 
@@ -29,6 +30,7 @@ const registerDTO = Joi.object({
 const loginDTO = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(8).max(25).required(),
+    loginType: Joi.string().regex(/^(web|mobile|other)$/).default(DeviceTypes.WEB)
 });
 
 module.exports = {

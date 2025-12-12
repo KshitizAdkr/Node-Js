@@ -1,3 +1,11 @@
+// For finding #Object
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise);
+  console.error('Reason:', reason);
+  console.error(reason.stack || reason);
+});
+
+//Server
 const http = require("http")
 const app = require("./src/config/express-config") //importing express config file
 

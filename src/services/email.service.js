@@ -5,7 +5,7 @@ class MailService{
   #transport;
   constructor() {
     try {
-      console.log(SmtpConfig)
+      // console.log(SmtpConfig)
       this.#transport = nodemailer.createTransport({
         host: SmtpConfig.host,
         port: SmtpConfig.port, 

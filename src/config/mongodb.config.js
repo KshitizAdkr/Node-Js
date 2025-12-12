@@ -12,9 +12,10 @@ const mongoose = require("mongoose");
        }) 
        console.log("**** Mongodb Server Connected Succesully... ****")
     }
-    catch(expression){
-        throw{
-            code: 500, message:"Mongodb server connection failed", status: "ERR_MONGODB_CONNECTION"
-        }
-    }
+    catch(exception) {
+    console.log(exception)
+    console.log("Mongodb server connection error.....")
+    throw {code: 500, message: "Mongodb Server Connection failed..", status: "MONGO_CONNECTION_ERR"}
+    // process.exit(1)
+  }
 })();
